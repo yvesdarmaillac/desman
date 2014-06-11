@@ -14,7 +14,7 @@ implements Paradigm {
     public Iterable<Contribution> genesis() {
 
         final Iterator iter = new Iterator<Contribution>() {
-            Contribution contribution;
+            Contribution contribution = new Contribution();
             int i = 0;
             Random r= new Random();
 

@@ -49,11 +49,11 @@ implements Tool {
         FileInputFormat.addInputPath(job, input);
 
         job.setMapperClass(GeneticMapper.class);
-        job.setMapOutputKeyClass(GeneticKeyWritable.class);
-        job.setMapOutputValueClass(GeneticKeyWritable.class);
+        job.setMapOutputKeyClass(GeneticWritable.class);
+        job.setMapOutputValueClass(GeneticWritable.class);
 
-        job.setPartitionerClass(GeneticPartitioner.class);
-        job.setGroupingComparatorClass(GeneticPartitioner.class);
+        job.setPartitionerClass(GeneticWritable.Partitioner.class);
+        job.setGroupingComparatorClass(GeneticWritable.GroupingComparator.class);
 
         job.setReducerClass(GeneticReducer.class);
         job.setOutputFormatClass(SequenceFileAsBinaryOutputFormat.class);

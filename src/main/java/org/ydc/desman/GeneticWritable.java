@@ -121,11 +121,11 @@ extends BytesWritable {
         }
     }
 
-    public static class GroupComparator
+    public static class GroupingComparator
     extends WritableComparator {
         BytesWritable.Comparator bytesWritableComparator = new BytesWritable.Comparator();
 
-        public GroupComparator() {
+        public GroupingComparator() {
             super(GeneticWritable.class);
         }
 
