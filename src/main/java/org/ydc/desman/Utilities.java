@@ -34,7 +34,8 @@ implements Tool {
         FileSystem fs = FileSystem.get(URI.create(args[0]), conf);
 
         BytesWritable populationWritable = new BytesWritable();
-        GeneticWritable contributionWritable = new GeneticWritable();
+        BytesWritable contributionWritable = new BytesWritable();
+        GeneticHelper helper = new GeneticHelper();
 
         SequenceFile.Reader reader = null;
 
@@ -42,9 +43,9 @@ implements Tool {
             reader = new SequenceFile.Reader(fs, path, conf);
 
             while(reader.next(populationWritable, contributionWritable)) {
-                byte[] individual = contributionWritable.getGenetic();
-                byte[] population = populationWritable.getBytes();
-                double[] data = contributionWritable.getData();
+                byte[] individual = helper.getGenetic(contributionWritable);
+                byte[] population = populationWritable.copyBytes();
+                double[] data = helper.getData(contributionWritable);
                 
                 System.out.printf("%s\t%s\n", populationWritable.toString(), contributionWritable.toString());
             }

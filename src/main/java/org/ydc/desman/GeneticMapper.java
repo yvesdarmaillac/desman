@@ -7,15 +7,18 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
 public class GeneticMapper
-extends Mapper<BytesWritable, GeneticWritable, GeneticWritable, GeneticWritable>
+extends Mapper<BytesWritable, BytesWritable, BytesWritable, BytesWritable>
 {
     Paradigm paradigm;
     Contribution contribution = new Contribution();
-    final GeneticWritable populationWritable = new GeneticWritable();
-    final GeneticWritable contributionWritable = new GeneticWritable();
+
+    final GeneticHelper helper = new GeneticHelper();
+
+    final BytesWritable populationWritable = new BytesWritable();
+    final BytesWritable contributionWritable = new BytesWritable();
 
     @Override
-    public void setup(Mapper<BytesWritable, GeneticWritable, GeneticWritable, GeneticWritable>.Context context)
+    public void setup(Context context)
     {
         Configuration conf = context.getConfiguration();
         Class<?> paradigmClass = conf.getClass("paradigm.class", SimpleParadigm.class);
@@ -36,21 +39,19 @@ extends Mapper<BytesWritable, GeneticWritable, GeneticWritable, GeneticWritable>
     }
 
     @Override
-    public void map(BytesWritable key, GeneticWritable value, Context context)
+    public void map(BytesWritable key, BytesWritable value, Context context)
         throws IOException, InterruptedException
         {
-            byte[] population = key.getBytes();
-            byte[] individual = value.getGenetic();
-            double[] data = value.getData();
+            byte[] population = key.copyBytes();
+            byte[] individual = helper.getGenetic(value);
+            double[] data = helper.getData(value);
 
             this.contribution.set(individual, population, data);
             this.contribution = this.paradigm.mutation(this.contribution);
 
-            this.populationWritable.setGenetic(this.contribution.getPopulation());
-            this.populationWritable.setData(this.contribution.getData());
+            this.helper.set(this.populationWritable, this.contribution.getPopulation(), this.contribution.getData()[0]);
 
-            this.contributionWritable.setGenetic(this.contribution.getIndividual());
-            this.contributionWritable.setData(this.contribution.getData());
+            this.helper.set(this.contributionWritable, this.contribution.getIndividual(), this.contribution.getData());
 
             context.write(this.populationWritable, this.contributionWritable);
         }

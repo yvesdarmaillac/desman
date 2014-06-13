@@ -9,20 +9,23 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.BytesWritable;
 
 public class GeneticReducer
-extends Reducer<GeneticWritable, GeneticWritable, BytesWritable, GeneticWritable> { 
+extends Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> { 
 
     Paradigm paradigm;
 
-    final GeneticWritable contributionWritable = new GeneticWritable();
+    final BytesWritable contributionWritable = new BytesWritable();
     final BytesWritable populationWritable = new BytesWritable();
+
+    final GeneticHelper helper = new GeneticHelper();
 
     static class ContributionIterable implements Iterable<Contribution>, Iterator<Contribution> {
         byte[] population;
-        Iterator<GeneticWritable> iter;
-        Contribution contribution = new Contribution();
+        Iterator<BytesWritable> iter;
+        final Contribution contribution = new Contribution();
+        final GeneticHelper helper = new GeneticHelper();
 
-        public void set(GeneticWritable key, Iterable<GeneticWritable> value) {
-            this.population = key.getGenetic();
+        public void set(BytesWritable key, Iterable<BytesWritable> value) {
+            this.population = helper.getGenetic(key);
             this.iter = value.iterator();
         }
 
@@ -35,9 +38,9 @@ extends Reducer<GeneticWritable, GeneticWritable, BytesWritable, GeneticWritable
         }
 
         public Contribution next() {
-            GeneticWritable geneticWritable = iter.next();
-            byte[] individual = geneticWritable.getGenetic();
-            double[] data = geneticWritable.getData();
+            BytesWritable writable = iter.next();
+            byte[] individual = helper.getGenetic(writable);
+            double[] data = helper.getData(writable);
 
             contribution.set(individual, population, data);
 
@@ -71,7 +74,7 @@ extends Reducer<GeneticWritable, GeneticWritable, BytesWritable, GeneticWritable
     }
 
     @Override
-    public void reduce(GeneticWritable key, Iterable<GeneticWritable> value, Context context)
+    public void reduce(BytesWritable key, Iterable<BytesWritable> value, Context context)
     throws IOException, InterruptedException {
 
         contributionIterable.set(key, value);
@@ -85,8 +88,7 @@ extends Reducer<GeneticWritable, GeneticWritable, BytesWritable, GeneticWritable
 
             populationWritable.set(population, 0,  population.length);
 
-            contributionWritable.setGenetic(individual);
-            contributionWritable.setData(data);
+            this.helper.set(this.contributionWritable, individual, data);
 
             context.write(populationWritable, contributionWritable);
         }

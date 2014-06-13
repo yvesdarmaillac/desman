@@ -49,14 +49,16 @@ implements Tool {
         FileInputFormat.addInputPath(job, input);
 
         job.setMapperClass(GeneticMapper.class);
-        job.setMapOutputKeyClass(GeneticWritable.class);
-        job.setMapOutputValueClass(GeneticWritable.class);
+        job.setMapOutputKeyClass(BytesWritable.class);
+        job.setMapOutputValueClass(BytesWritable.class);
 
-        job.setPartitionerClass(GeneticWritable.Partitioner.class);
-        job.setGroupingComparatorClass(GeneticWritable.GroupingComparator.class);
+        job.setPartitionerClass(GeneticHelper.Partitioner.class);
+        job.setGroupingComparatorClass(GeneticHelper.GroupingComparator.class);
 
         job.setReducerClass(GeneticReducer.class);
         job.setOutputFormatClass(SequenceFileAsBinaryOutputFormat.class);
+        job.setOutputKeyClass(BytesWritable.class);
+        job.setOutputValueClass(BytesWritable.class);
         FileOutputFormat.setOutputPath(job, output);
 
         return job.waitForCompletion(true) ? 0 : 1;

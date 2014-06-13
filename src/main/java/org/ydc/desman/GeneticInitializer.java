@@ -47,7 +47,8 @@ implements Tool {
         }
 
         BytesWritable populationWritable = new BytesWritable();
-        GeneticWritable contributionWritable = new GeneticWritable();
+        BytesWritable contributionWritable = new BytesWritable();
+        GeneticHelper helper = new GeneticHelper();
 
         SequenceFile.Writer writer = null;
 
@@ -63,8 +64,7 @@ implements Tool {
                 
                 populationWritable.set(population, 0,  population.length);
 
-                contributionWritable.setGenetic(individual);
-                contributionWritable.setData(data);
+                helper.set(contributionWritable, individual, data);
 
                 writer.append(populationWritable, contributionWritable);
             }
