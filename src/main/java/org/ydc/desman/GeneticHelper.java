@@ -16,23 +16,28 @@ public class GeneticHelper {
     final ByteBuffer wrapper = ByteBuffer.wrap(buffer);
 
     public byte[] getGenetic(BytesWritable writable) {
+        wrapper.clear();
         System.arraycopy(writable.getBytes(), 0, buffer, 0, writable.getLength());
 
-        byte[] genetic = new byte[wrapper.getInt(4)];
+        byte[] genetic = new byte[wrapper.getInt()];
 
-        wrapper.position(wrapper.getInt(0) * 8 + 8);
+        wrapper.position(8);
         wrapper.get(genetic);
 
         return genetic;
     }
 
     public double[] getData(BytesWritable writable) {
+        wrapper.clear();
         System.arraycopy(writable.getBytes(), 0, buffer, 0, writable.getLength());
 
-        double[] data = new double[wrapper.getInt(0)];
+        int offset = wrapper.getInt();
+        double[] data = new double[wrapper.getInt()];
 
+        wrapper.position(8 + offset);
+        
         for(int i = 0; i < data.length; i++) {
-            data[i] = wrapper.getDouble(8 + i * 8);
+            data[i] = wrapper.getDouble();
         }
 
         return data;
@@ -40,22 +45,22 @@ public class GeneticHelper {
 
     public void set(BytesWritable writable, byte[] genetic, double[] data) {
         wrapper.clear();
-        wrapper.putInt(data.length);
         wrapper.putInt(genetic.length);
+        wrapper.putInt(data.length);
+        wrapper.put(genetic);
         for(int i = 0; i < data.length; i++) {
             wrapper.putDouble(data[i]);
         }
-        wrapper.put(genetic);
 
         writable.set(buffer, 0, wrapper.position());
     }
 
     public void set(BytesWritable writable, byte[] genetic, double data) {
         wrapper.clear();
-        wrapper.putInt(1);
         wrapper.putInt(genetic.length);
-        wrapper.putDouble(data);
+        wrapper.putInt(1);
         wrapper.put(genetic);
+        wrapper.putDouble(data);
 
         writable.set(buffer, 0, wrapper.position());
     }
@@ -72,24 +77,27 @@ public class GeneticHelper {
 
         @Override
         public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+            s1+= 4;
+            s2+= 4;
             int gl1 = readInt(b1, s1);
             int gl2 = readInt(b2, s2);
-            int dl1 = readInt(b1, s1 + 4) * 8;
-            int dl2 = readInt(b2, s2 + 4) * 8;
 
-            s1+= 8;
-            s2+= 8;
+            s1+= 4;
+            s2+= 4;
+            int dl1 = readInt(b1, s1) * 8;
+            int dl2 = readInt(b2, s2) * 8;
 
+            s1+= 4;
+            s2+= 4;
             int result = compareBytes(b1, s1, gl1, b2, s2, gl2);
 
             s1+= gl1;
             s2+= gl2;
-
             for(int i = 0; i < dl1 && i < dl2 && result == 0; i+= 8) {
                 double data1 = readDouble(b1, s1 + i);
                 double data2 = readDouble(b2, s2 + i);
 
-                result = -Double.compare(data1, data2);
+                result = Double.compare(data1, data2);
             }
 
             return result;
@@ -120,19 +128,14 @@ public class GeneticHelper {
 
         @Override
         public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+            s1+= 4;
+            s2+= 4;
             int gl1 = readInt(b1, s1);
             int gl2 = readInt(b2, s2);
-            int dl1 = readInt(b1, s1 + 4) * 8;
-            int dl2 = readInt(b2, s2 + 4) * 8;
 
             s1+= 8;
             s2+= 8;
-
             return compareBytes(b1, s1, gl1, b2, s2, gl2);
         }
-    }
-
-    static {
-        WritableComparator.define(BytesWritable.class, new Comparator());
     }
 }

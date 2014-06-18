@@ -1,6 +1,7 @@
 package org.ydc.desman;
 
 import java.io.IOException;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -23,16 +24,13 @@ extends Mapper<BytesWritable, BytesWritable, BytesWritable, BytesWritable>
         Configuration conf = context.getConfiguration();
         Class<?> paradigmClass = conf.getClass("paradigm.class", SimpleParadigm.class);
         String[] paradigmArgs = conf.getStrings("paradigm.args");
+
         try
         {
             this.paradigm = ((Paradigm)paradigmClass.newInstance());
             this.paradigm.setParameters(paradigmArgs);
         }
-        catch (InstantiationException x)
-        {
-            throw new RuntimeException(x);
-        }
-        catch (IllegalAccessException x)
+        catch (InstantiationException | IllegalAccessException x)
         {
             throw new RuntimeException(x);
         }
@@ -46,7 +44,7 @@ extends Mapper<BytesWritable, BytesWritable, BytesWritable, BytesWritable>
             byte[] individual = helper.getGenetic(value);
             double[] data = helper.getData(value);
 
-            this.contribution.set(individual, population, data);
+            this.contribution.set(population, individual, data);
             this.contribution = this.paradigm.mutation(this.contribution);
 
             this.helper.set(this.populationWritable, this.contribution.getPopulation(), this.contribution.getData()[0]);

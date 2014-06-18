@@ -5,7 +5,7 @@ public class Contribution {
     byte[] population;
     double[] data;
 
-    public void set(byte[] individual, byte[] population, double[] data) {
+    public void set(byte[] population, byte[] individual, double[] data) {
         this.individual = individual;
         this.population = population;
         this.data = data;

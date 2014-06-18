@@ -1,7 +1,6 @@
 package org.ydc.desman;
 
 import java.io.IOException;
-import java.lang.Iterable;
 import java.util.Iterator;
 
 import org.apache.hadoop.conf.Configuration;
@@ -18,6 +17,8 @@ extends Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
 
     final GeneticHelper helper = new GeneticHelper();
 
+    double dataMin = Double.MAX_VALUE;
+
     static class ContributionIterable implements Iterable<Contribution>, Iterator<Contribution> {
         byte[] population;
         Iterator<BytesWritable> iter;
@@ -29,24 +30,28 @@ extends Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
             this.iter = value.iterator();
         }
 
+        @Override
         public Iterator<Contribution> iterator() {
             return this;
         }
 
+        @Override
         public boolean hasNext() {
             return iter.hasNext();
         }
 
+        @Override
         public Contribution next() {
             BytesWritable writable = iter.next();
             byte[] individual = helper.getGenetic(writable);
             double[] data = helper.getData(writable);
 
-            contribution.set(individual, population, data);
+            contribution.set(population, individual, data);
 
             return contribution;
         }
 
+        @Override
         public void remove() {
             iter.remove();
         }
@@ -64,12 +69,8 @@ extends Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
             paradigm = (Paradigm)paradigmClass.newInstance();
             paradigm.setParameters(paradigmArgs);
 
-        } catch (InstantiationException x) {
+        } catch (InstantiationException | IllegalAccessException x) {
             throw new RuntimeException(x);
-
-        } catch (IllegalAccessException x) {
-            throw new RuntimeException(x);
-
         }
     }
 
@@ -91,6 +92,10 @@ extends Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> {
             this.helper.set(this.contributionWritable, individual, data);
 
             context.write(populationWritable, contributionWritable);
+
+            if(data[0] < dataMin) {
+                dataMin = data[0];
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.ydc.desman;
 
 import java.net.URI;
+import java.util.Arrays;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -43,11 +44,31 @@ implements Tool {
             reader = new SequenceFile.Reader(fs, path, conf);
 
             while(reader.next(populationWritable, contributionWritable)) {
-                byte[] individual = helper.getGenetic(contributionWritable);
                 byte[] population = populationWritable.copyBytes();
+                byte[] individual = helper.getGenetic(contributionWritable);
                 double[] data = helper.getData(contributionWritable);
+
+                StringBuilder builder = new StringBuilder();
+
+                for(int i = 0; i < population.length; i++) {
+                    String num = Integer.toHexString(0xff & population[i]);
+                    if(num.length() < 2) {
+                        builder.append('0');
+                    }
+                    builder.append(num);
+                }
+
+                builder.append('\t');
+
+                for(int i = 0; i < individual.length; i++) {
+                    String num = Integer.toHexString(0xff & individual[i]);
+                    if(num.length() < 2) {
+                        builder.append('0');
+                    }
+                    builder.append(num);
+                }
                 
-                System.out.printf("%s\t%s\n", populationWritable.toString(), contributionWritable.toString());
+                System.out.printf("%s\t%s\n", builder.toString(), Arrays.toString(data));
             }
         } finally {
             IOUtils.closeStream(reader);

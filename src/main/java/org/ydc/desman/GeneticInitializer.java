@@ -58,8 +58,8 @@ implements Tool {
             Iterable<Contribution> contributions = paradigm.genesis();
 
             for(Contribution contribution: contributions) {
-                byte[] individual = contribution.getIndividual();
                 byte[] population = contribution.getPopulation();
+                byte[] individual = contribution.getIndividual();
                 double[] data = contribution.getData();
                 
                 populationWritable.set(population, 0,  population.length);
