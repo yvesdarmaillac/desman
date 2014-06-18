@@ -7,7 +7,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
-public class GeneticMapper
+public class EvolutionMapper
 extends Mapper<BytesWritable, BytesWritable, BytesWritable, BytesWritable>
 {
     Paradigm paradigm;

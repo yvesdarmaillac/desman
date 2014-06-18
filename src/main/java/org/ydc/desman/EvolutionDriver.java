@@ -18,16 +18,17 @@ import org.apache.hadoop.util.ToolRunner;
  * 
  * @author ydc
  */
-public class GeneticDriver
+public class EvolutionDriver
 extends Configured
 implements Tool {
 
     Paradigm paradigm;
     
     /**
-     * Builds an instance of a {@link GeneticDriver}.
-     * /
-    public GeneticDriver() {}
+     * Builds an instance of a {@link EvolutionDriver}.
+     */
+    public EvolutionDriver() {
+    }
 
     /**
      * Execute the command with the given arguments.
@@ -63,7 +64,7 @@ implements Tool {
         job.setInputFormatClass(GeneticInputFormat.class);
         FileInputFormat.addInputPath(job, input);
 
-        job.setMapperClass(GeneticMapper.class);
+        job.setMapperClass(EvolutionMapper.class);
         job.setMapOutputKeyClass(BytesWritable.class);
         job.setMapOutputValueClass(BytesWritable.class);
 
@@ -71,7 +72,7 @@ implements Tool {
         job.setPartitionerClass(GeneticHelper.Partitioner.class);
         job.setGroupingComparatorClass(GeneticHelper.GroupingComparator.class);
 
-        job.setReducerClass(GeneticReducer.class);
+        job.setReducerClass(EvolutionReducer.class);
         job.setOutputFormatClass(GeneticOutputFormat.class);
         FileOutputFormat.setOutputPath(job, output);
 
@@ -86,7 +87,7 @@ implements Tool {
      * @see Paradigm
      */
     public static void main(String[] args) throws Exception {
-        int exitCode = ToolRunner.run(new GeneticDriver(), args);
+        int exitCode = ToolRunner.run(new EvolutionDriver(), args);
         System.exit(exitCode);
     }
 }

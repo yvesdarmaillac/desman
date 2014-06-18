@@ -7,7 +7,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.BytesWritable;
 
-public class GeneticReducer
+public class EvolutionReducer
 extends Reducer<BytesWritable, BytesWritable, BytesWritable, BytesWritable> { 
 
     Paradigm paradigm;

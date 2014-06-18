@@ -7,7 +7,7 @@ import org.apache.hadoop.io.WritableComparator;
 /**
  * A class that helps to format, compare and partition genetic data used in map reduce evolutionary algorithm.
  * 
- * @see GeneticDriver
+ * @see EvolutionDriver
  * @author ydc
  */
 public class GeneticHelper {
