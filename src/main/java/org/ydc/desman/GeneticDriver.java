@@ -14,21 +14,26 @@ import org.apache.hadoop.util.ToolRunner;
 
 /**
  *
- * @author ydc
- * 
  * Hadoop driver to run a genetic algorithm.
  * 
+ * @author ydc
  */
 public class GeneticDriver
 extends Configured
 implements Tool {
 
     Paradigm paradigm;
+    
+    /**
+     * Builds an instance of a {@link GeneticDriver}.
+     * /
+    public GeneticDriver() {}
 
     /**
-     * {@inheritDoc} 
-     * @param args
-     * @return
+     * Execute the command with the given arguments.
+     *
+     * @param args command specific arguments.
+     * @return exit code.
      * @throws Exception
      */
     @Override
@@ -73,6 +78,13 @@ implements Tool {
         return job.waitForCompletion(true) ? 0 : 1;
     }
 
+    /**
+     * Starts a genetic algorithm job.
+     * 
+     * @param args Job arguments (input dir, output dir, paradigm class)
+     * @throws Exception
+     * @see Paradigm
+     */
     public static void main(String[] args) throws Exception {
         int exitCode = ToolRunner.run(new GeneticDriver(), args);
         System.exit(exitCode);

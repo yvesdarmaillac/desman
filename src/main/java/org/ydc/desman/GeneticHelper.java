@@ -1,20 +1,25 @@
 package org.ydc.desman;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-
-import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
 
+/**
+ * A class that helps to format, compare and partition genetic data used in map reduce evolutionary algorithm.
+ * 
+ * @see GeneticDriver
+ * @author ydc
+ */
 public class GeneticHelper {
     final byte[] buffer = new byte[8192];
     final ByteBuffer wrapper = ByteBuffer.wrap(buffer);
 
+    /**
+     * Builds a new instance of {@link GeneticHelper}.
+     */
+    public GeneticHelper() {        
+    }
+    
     public byte[] getGenetic(BytesWritable writable) {
         wrapper.clear();
         System.arraycopy(writable.getBytes(), 0, buffer, 0, writable.getLength());
